@@ -29,5 +29,11 @@ export default function Home() {
     
     //   {JSON.stringify({data}, null, 2)}
     // </div>
+
+    // <ul>
+    //   {data.books.map(book => (
+    //     <li key={book.id}>{book.author}</li>
+    //   ))}
+    // </ul>
   );
 }

@@ -1,39 +1,72 @@
-import Head from "next/head";
-import Image from "next/image";
-import styles from "../styles/Home.module.css";
-import { useQuery } from "urql";
+import React, { useRef, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/router";
 
+const signup = async (email, password) => {
+  const data = {
+    email,
+    password,
+  };
 
+  const JSONdata = JSON.stringify(data);
+
+  const options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSONdata,
+  };
+
+  const response = await fetch("/api/users", options);
+  const result = await response.json();
+  localStorage.setItem("token", result.token);
+  console.log(result);
+  
+};
 
 export default function Home() {
-  const [{ data, fetching, error }] = useQuery({
-    query: ` query {
-      books {
-        author
-        id
-        user {
-          name
-        }
-      }
-    }`,
-  });
+  const emailRef = useRef();
+  const passwordRef = useRef();
 
+  const router = useRouter();
 
+  async function handleSubmit(e) {
+    e.preventDefault();
+    const email = emailRef.current.value;
+    const password = passwordRef.current.value;
+    await signup(email, password);
+    router.push("/dashboard");
+  }
 
-  if (fetching) return <p>Loading...</p>;
-  if (error) return <p>Oh no... {error.message}</p>;
- console.log(data)
   return (
-    <h1> Hi </h1>
-    // <div>
-    
-    //   {JSON.stringify({data}, null, 2)}
-    // </div>
-
-    // <ul>
-    //   {data.books.map(book => (
-    //     <li key={book.id}>{book.author}</li>
-    //   ))}
-    // </ul>
+    <>
+      <div style={{ padding: 300 }}>
+        <form>
+          <fieldset>
+            <legend>SignUp</legend>
+            <label>
+              Email Address: <input type="email" required name="email" ref={emailRef} />
+            </label>
+            <br />
+            <label>
+              Password:
+              <input type="password" required name="password" ref={passwordRef} />
+            </label>
+            <br />
+            <small style={{ marginTop: 20 }}>
+              <Link href="/login">Already Registered?</Link>
+            </small>
+            <br />
+            <input
+              onClick={handleSubmit}
+              style={{ marginTop: 20 }}
+              type="submit"
+              value="SignUp"
+            ></input>
+          </fieldset>
+        </form>
+      </div>
+    </>
   );
 }
